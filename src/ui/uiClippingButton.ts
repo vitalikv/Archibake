@@ -1,3 +1,65 @@
-export class UiClippingButton {
-}
+import { ApiUiToThree } from '@/api/apiLocal/apiUiToThree';
+import { ContextSingleton } from '@/core/ContextSingleton';
+import { UiClippingSlider } from './uiClippingSlider';
 
+export class UiClippingButton extends ContextSingleton<UiClippingButton> {
+  private container: HTMLElement;
+  private button: HTMLButtonElement;
+  private isEnabled: boolean = false;
+
+  public init(container: HTMLDivElement) {
+    this.container = container;
+    const div = this.crDiv();
+    this.container.append(div);
+    this.eventStop({ div });
+
+    this.button = div.children[0] as HTMLButtonElement;
+    this.button.addEventListener('click', () => this.toggle());
+
+    this.updateText();
+  }
+
+  private crDiv() {
+    let div = document.createElement('div');
+    div.innerHTML = this.html();
+
+    return div;
+  }
+
+  private html() {
+    const css1 = `position: absolute; bottom: 70px; right: 20px; background: white; padding: 10px; cursor: pointer;`;
+
+    const html = `<button nameId="btnClipping" style="${css1}">Вкл сечение</button>`;
+
+    return html;
+  }
+
+  private eventStop({ div }) {
+    const arrEvent = ['onmousedown', 'onwheel', 'onmousewheel', 'onmousemove', 'ontouchstart', 'ontouchend', 'ontouchmove'];
+
+    arrEvent.forEach((events) => {
+      div[events] = (e) => {
+        e.stopPropagation();
+      };
+    });
+  }
+
+  private toggle() {
+    this.isEnabled = !this.getEnabled();
+    this.updateText();
+
+    if (this.isEnabled) {
+      ApiUiToThree.activateBakeScene();
+    } else {
+      ApiUiToThree.deActivateBakeScene();
+    }
+  }
+
+  private updateText() {
+    this.button.textContent = this.getEnabled() ? 'Выкл сечение' : 'Вкл сечение';
+  }
+
+  private getEnabled() {
+    return this.isEnabled;
+  }
+}

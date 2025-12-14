@@ -6,6 +6,7 @@ import { ContextSingleton } from '@/core/ContextSingleton';
 import { CameraManager } from '@/threeApp/scene/cameraManager';
 import { EffectsManager } from '@/threeApp/scene/effectsManager';
 import { ApiThreeToUi } from '@/api/apiLocal/apiThreeToUi';
+import { RoomBuilder } from '@/threeApp/model/roomBuilder';
 
 export class SceneManager extends ContextSingleton<SceneManager> {
   stats = null;
@@ -28,6 +29,7 @@ export class SceneManager extends ContextSingleton<SceneManager> {
     this.initControls();
     this.initLights();
     this.initHelpers();
+    this.initRoom();
 
     this.render();
   }
@@ -55,12 +57,6 @@ export class SceneManager extends ContextSingleton<SceneManager> {
   private initScene() {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xffffff);
-
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    cube.position.x = 3;
-    this.scene.add(cube);
   }
 
   private initCamera() {
@@ -105,6 +101,13 @@ export class SceneManager extends ContextSingleton<SceneManager> {
   private initHelpers() {
     const gridHelper = new THREE.GridHelper(10, 10);
     this.scene.add(gridHelper);
+  }
+
+  private initRoom() {
+    const roomBuilder = new RoomBuilder(10, 3, 10);
+    const room = roomBuilder.build();
+    roomBuilder.addFurniture();
+    this.scene.add(room);
   }
 
   public render() {
